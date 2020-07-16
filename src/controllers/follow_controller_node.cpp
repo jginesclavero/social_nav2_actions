@@ -100,7 +100,7 @@ public:
           break;
         case RUNNING:
           {
-            if (executor_client_->getResult().has_value()) {
+            if (executor_client_->getResult().value()) {
               if (executor_client_->getResult().value().success) {
                 std::cout << "RUNNING Successful finished " << std::endl;
 
@@ -125,7 +125,7 @@ public:
           break;
           case RETURNING:
           {
-            if (executor_client_->getResult().has_value()) {
+            if (executor_client_->getResult().value()) {
               if (executor_client_->getResult().value().success) {
                 update_approach_tf_pub_->publish(std_msgs::msg::Empty());
                 plot_csv_pub_->publish(std_msgs::msg::Empty());
