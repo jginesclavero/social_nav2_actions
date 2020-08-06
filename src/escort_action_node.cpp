@@ -100,7 +100,7 @@ public:
     RCLCPP_INFO(get_logger(), "Agent id [%s]", agent_id_.c_str());
     navigation_action_client_ =
       rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(shared_from_this(),
-        "navigate_to_pose");
+        "NavigateToPose");
     bool is_action_server_ready = false;
     do {
       RCLCPP_INFO(get_logger(), "Waiting for navigation action server...");
@@ -203,7 +203,7 @@ private:
       auto message = diagnostic_msgs::msg::KeyValue();
       message.key = agent_id_;
       message.value = "escorting";
-      action_pub_->publish(message);
+      //action_pub_->publish(message);
       action_setted = true;
     }
 
