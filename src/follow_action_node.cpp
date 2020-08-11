@@ -27,6 +27,7 @@
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "nav2_costmap_2d/costmap_subscriber.hpp"
 
+#include "social_navigation_msgs/msg/set_human_action.hpp"
 #include "plansys2_executor/ActionExecutorClient.hpp"
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -41,8 +42,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "diagnostic_msgs/msg/key_value.hpp"
 
+using SetHumanAction = social_navigation_msgs::msg::SetHumanAction;
 using GetParameters = rcl_interfaces::srv::GetParameters;
 using LifecycleNodeInterface = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
 using nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
@@ -73,7 +74,7 @@ public:
       "/global_costmap/global_costmap/get_parameters");
     private_node_ = rclcpp::Node::make_shared("follow_action_pub");
     action_pub_ =
-      private_node_->create_publisher<diagnostic_msgs::msg::KeyValue>(
+      private_node_->create_publisher<SetHumanAction>(
       "/social_navigation/set_agent_action",
       rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable());
 
@@ -196,9 +197,9 @@ private:
   void actionStep()
   {
     if (!action_setted && get_current_state().label() == "active") {
-      auto message = diagnostic_msgs::msg::KeyValue();
-      message.key = agent_id_;
-      message.value = "following";
+      auto message = SetHumanAction();
+      message.agent_id = agent_id_;
+      message.action = "following";
       action_pub_->publish(message);
       action_setted = true;
     }
@@ -245,7 +246,7 @@ private:
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   std::map<std::string, float> params_map;
   std::unique_ptr<nav2_costmap_2d::CostmapSubscriber> costmap_sub_;
-  rclcpp::Publisher<diagnostic_msgs::msg::KeyValue>::SharedPtr action_pub_;
+  rclcpp::Publisher<SetHumanAction>::SharedPtr action_pub_;
   std::string agent_id_;
   std::vector<geometry_msgs::msg::Pose> poses_;
   bool action_setted;
