@@ -71,7 +71,7 @@ public:
       shared_from_this(), "global_costmap/costmap_raw");
     params_client_ = shared_from_this()->create_client<GetParameters>(
       "/global_costmap/global_costmap/get_parameters");
-    private_node_ = rclcpp::Node::make_shared("social_layer_sub");
+    private_node_ = rclcpp::Node::make_shared("follow_action_pub");
     action_pub_ =
       private_node_->create_publisher<diagnostic_msgs::msg::KeyValue>(
       "/social_navigation/set_agent_action",
