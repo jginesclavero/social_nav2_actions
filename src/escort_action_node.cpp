@@ -26,6 +26,8 @@
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "nav2_costmap_2d/costmap_subscriber.hpp"
 
+//#include "social_navigation_msgs/srv/set_human_action.hpp"
+
 #include "plansys2_executor/ActionExecutorClient.hpp"
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -43,8 +45,10 @@
 #include "diagnostic_msgs/msg/key_value.hpp"
 
 using GetParameters = rcl_interfaces::srv::GetParameters;
+using SetHumanAction = social_navigation_msgs::srv::SetHumanAction;
 using LifecycleNodeInterface = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
 using nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
+using namespace std::chrono_literals;
 
 class ScortAction : public plansys2::ActionExecutorClient
 {
@@ -70,10 +74,11 @@ public:
       shared_from_this(), "global_costmap/costmap_raw");
     params_client_ = shared_from_this()->create_client<GetParameters>(
       "/global_costmap/global_costmap/get_parameters");
-    private_node_ = rclcpp::Node::make_shared("social_layer_sub");
+    private_node_ = rclcpp::Node::make_shared("escort_action_pub");
+
     action_pub_ =
       private_node_->create_publisher<diagnostic_msgs::msg::KeyValue>(
-      "social_navigation/set_agent_action",
+      "/social_navigation/set_agent_action",
       rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable());
 
     bool is_server_ready = false;
@@ -200,10 +205,11 @@ private:
   void actionStep()
   {
     if (!action_setted && get_current_state().label() == "active") {
+
       auto message = diagnostic_msgs::msg::KeyValue();
       message.key = agent_id_;
       message.value = "escorting";
-      //action_pub_->publish(message);
+      action_pub_->publish(message);
       action_setted = true;
     }
 
@@ -227,12 +233,7 @@ private:
 
   bool isFinished()
   {
-    /* if (getFeedback()->progress >= 100.0) {
-      // Check result of navigation
-      return true;
-    } else {
-      return false;
-    }*/
+
   }
 
   using NavigationGoalHandle =

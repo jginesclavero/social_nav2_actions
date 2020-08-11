@@ -80,7 +80,7 @@ public:
     private_node_ = rclcpp::Node::make_shared("social_layer_sub");
     action_pub_ =
       private_node_->create_publisher<diagnostic_msgs::msg::KeyValue>(
-      "social_navigation/set_agent_action",
+      "/social_navigation/set_agent_action",
       rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable());
 
     bool is_server_ready = false;
@@ -109,7 +109,7 @@ public:
 
     navigation_action_client_ =
       rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(shared_from_this(),
-        "navigate_to_pose");
+        "NavigateToPose");
 
    
     bool is_action_server_ready = false;

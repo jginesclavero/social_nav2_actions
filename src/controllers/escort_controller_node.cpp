@@ -147,7 +147,7 @@ private:
   StateType state_;
   bool knowledge_ready;
   std::shared_ptr<plansys2::ProblemExpertClient> problem_expert_;
-  std::shared_ptr<plansys2::ExecutorClient> executor_client_;
+  std::shared_ptr<plansys2::ExecutorClient>  executor_client_;
   std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> executor_state_client_;
   rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr update_approach_tf_pub_;
   rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr plot_csv_pub_;
