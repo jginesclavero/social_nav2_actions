@@ -239,15 +239,13 @@ private:
 
     if (navigation_goal_.pose.pose != approach_p) {
       navigation_goal_.pose.pose = approach_p;
-
-      //// RCLCPP_INFO(get_logger(), "P [%f %f]", approach_p.position.x, approach_p.position.y);
-      //future_navigation_goal_handle_ =
-      //  navigation_action_client_->async_send_goal(navigation_goal_);
-      //navigation_goal_handle_ = future_navigation_goal_handle_.get();
-      //if (!navigation_goal_handle_) {
-      //  RCLCPP_ERROR(get_logger(), "Goal was rejected by server");
-      //  return;
-      //}
+      future_navigation_goal_handle_ =
+        navigation_action_client_->async_send_goal(navigation_goal_);
+      navigation_goal_handle_ = future_navigation_goal_handle_.get();
+      if (!navigation_goal_handle_) {
+        RCLCPP_ERROR(get_logger(), "Goal was rejected by server");
+        return;
+      }
     }
 
     //double dist_to_goal = getDistance(approach_p, current_pos_);
