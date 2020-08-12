@@ -38,14 +38,6 @@ public:
     executor_state_client_ = shared_from_this()->create_client<lifecycle_msgs::srv::GetState>(
       "/executor/get_state");
     knowledge_ready = false;
-    update_approach_tf_pub_ =
-      create_publisher<std_msgs::msg::Empty>(
-      "social_navigation/update_approach_tf",
-      rclcpp::SystemDefaultsQoS());
-    plot_csv_pub_ =
-      create_publisher<std_msgs::msg::Empty>(
-      "social_nav_exp/task_finished",
-      rclcpp::SystemDefaultsQoS());
   }
 
   void init_knowledge()
@@ -110,7 +102,7 @@ public:
                 problem_expert_->setGoal(plansys2::Goal("(and(robot_at leia wp_home))"));
 
                 if (executor_client_->executePlan()) {
-                  state_ = RETURNING;
+                  state_ = FINISHED;
                 }
               } else {
                 std::cout << "RUNNING Finished with error: " <<
@@ -121,21 +113,9 @@ public:
             }
           }
           break;
-          case RETURNING:
+          case FINISHED:
           {
-            if (executor_client_->getResult().has_value()) {
-              if (executor_client_->getResult().value().success) {
-                update_approach_tf_pub_->publish(std_msgs::msg::Empty());
-                plot_csv_pub_->publish(std_msgs::msg::Empty());
-                std::cout << "RETURNING Successful finished " << std::endl;
-                state_ = STARTING;
-              } else {
-                std::cout << "RETURNING Finished with error: " <<
-                  executor_client_->getResult().value().error_info <<
-                  std::endl;
-                executor_client_->executePlan();  // replan and execute
-              }
-            }
+            RCLCPP_WARN(get_logger(), "Escorting finished, relaunch the experiment.");
           }
           break;
       }
@@ -143,14 +123,12 @@ public:
   }
 
 private:
-  typedef enum {STARTING, RUNNING, RETURNING} StateType;
+  typedef enum {STARTING, RUNNING, FINISHED} StateType;
   StateType state_;
   bool knowledge_ready;
   std::shared_ptr<plansys2::ProblemExpertClient> problem_expert_;
   std::shared_ptr<plansys2::ExecutorClient>  executor_client_;
   std::shared_ptr<rclcpp::Client<lifecycle_msgs::srv::GetState>> executor_state_client_;
-  rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr update_approach_tf_pub_;
-  rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr plot_csv_pub_;
 };
 
 int main(int argc, char ** argv)

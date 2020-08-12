@@ -62,6 +62,9 @@ public:
     tf_buffer_->setCreateTimerInterface(timer_interface);
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
     set_rate(1.0);
+
+    goal.x = -5;
+    goal.y = 3;
   }
 
   LifecycleNodeInterface::CallbackReturn
@@ -118,12 +121,12 @@ public:
   }
 
 private:
-  bool getAgentTF(std::string id, tf2::Transform & tf)
+  bool getTF(std::string target, std::string source, tf2::Transform & tf)
   {
     geometry_msgs::msg::TransformStamped global2agent;
     try {
       // Check if the transform is available
-      global2agent = tf_buffer_->lookupTransform("map", id, tf2::TimePointZero);
+      global2agent = tf_buffer_->lookupTransform(target, source, tf2::TimePointZero);
     } catch (tf2::TransformException & e) {
       RCLCPP_WARN(get_logger(), "%s", e.what());
       return false;
@@ -151,8 +154,7 @@ private:
     std::vector<geometry_msgs::msg::Pose> & poses)
   {
     tf2::Transform global2agent_tf2;
-    auto r = global2agent_tf2.getRotation();
-    if (!getAgentTF(id, global2agent_tf2)) {return;}
+    if (!getTF("map", id, global2agent_tf2)) {return;}
 
     tf2::Vector3 p1(
       -params_map["intimate_z_radius"] - params_map["robot_radius"],
@@ -224,12 +226,11 @@ private:
 
   bool isFinished()
   {
-    /* if (getFeedback()->progress >= 100.0) {
-      // Check result of navigation
-      return true;
-    } else {
-      return false;
-    }*/
+    tf2::Transform global2robot_tf2;
+    getTF("map", "base_footprint", global2robot_tf2);
+    auto pos = tf2ToPose(global2robot_tf2.getOrigin(), global2robot_tf2.getRotation());
+    return (pos.position.x > goal.x - 0.3 && pos.position.x < goal.x + 0.3 &&
+        pos.position.y > goal.y - 0.3 && pos.position.y < goal.y + 0.3);
   }
 
   using NavigationGoalHandle =
@@ -250,6 +251,7 @@ private:
   std::string agent_id_;
   std::vector<geometry_msgs::msg::Pose> poses_;
   bool action_setted;
+  geometry_msgs::msg::Point goal;
 };
 
 int main(int argc, char ** argv)
