@@ -62,7 +62,7 @@ public:
       get_node_timers_interface());
     tf_buffer_->setCreateTimerInterface(timer_interface);
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-    set_rate(1.0);
+    set_rate(0.5);
 
     goal.x = -4;
     goal.y = 3;
