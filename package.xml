@@ -13,19 +13,14 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>rclcpp_action</depend>
-  <depend>plansys2_msgs</depend>
   <depend>diagnostic_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>nav2_msgs</depend>
-  <depend>plansys2_executor</depend>
-  <depend>plansys2_domain_expert</depend>
   <depend>nav2_costmap_2d</depend>
   <depend>social_navigation_msgs</depend>
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
